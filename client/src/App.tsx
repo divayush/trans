@@ -74,26 +74,7 @@ function App() {
       <ThemeProvider>
         <TooltipProvider>
           <div className="min-h-screen bg-background text-foreground transition-colors duration-500">
-            {/* Theme Toggle */}
-          <div className="fixed top-4 right-4 z-50 flex gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-              className="glass-morphism rounded-lg border border-white/10 hover:bg-white/10 w-10 h-10 p-0"
-            >
-              {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-            </Button>
-
-            <Button
-              variant="ghost" 
-              size="sm"
-              onClick={() => setTheme(theme === 'neon' ? 'dark' : 'neon')}
-              className="glass-morphism rounded-lg border border-white/10 hover:bg-white/10 w-10 h-10 p-0"
-            >
-              <Zap className="w-4 h-4" />
-            </Button>
-          </div>
+            <ThemeToggle />
             <FloatingActionButton />
 
             <main className={showNavigation ? "pb-24 md:pb-8" : ""}>
