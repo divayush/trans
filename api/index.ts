@@ -56,7 +56,7 @@ app.post('/api/translate', async (req, res) => {
         console.log('Google Translate API response:', googleData);
 
         if (googleData && googleData[0] && googleData[0][0] && googleData[0][0][0]) {
-          let translatedText = googleData[0].map(item => item[0]).join('');
+          let translatedText = googleData[0].map((item: any) => item[0]).join('');
           
           const result = {
             translatedText,
@@ -68,7 +68,7 @@ app.post('/api/translate', async (req, res) => {
         }
       }
     } catch (googleError) {
-      console.warn('Google Translate failed, trying LibreTranslate:', googleError.message);
+      console.warn('Google Translate failed, trying LibreTranslate:', googleError instanceof Error ? googleError.message : String(googleError));
     }
 
     // Try LibreTranslate second
@@ -101,7 +101,7 @@ app.post('/api/translate', async (req, res) => {
         }
       }
     } catch (libreError) {
-      console.warn('LibreTranslate failed, trying MyMemory:', libreError.message);
+      console.warn('LibreTranslate failed, trying MyMemory:', libreError instanceof Error ? libreError.message : String(libreError));
     }
 
     // Final fallback to MyMemory with better Hindi handling
@@ -122,7 +122,7 @@ app.post('/api/translate', async (req, res) => {
 
       // Special handling for Hindi translations - prioritize better quality matches
       if (targetLanguage === 'hi' && data.matches && data.matches.length > 0) {
-        const bestMatch = data.matches.find(match => 
+        const bestMatch = data.matches.find((match: any) => 
           (match.reference === 'Machine Translation.' || match['created-by'] === 'MT!') && 
           match.quality >= 70 && 
           match.translation && 
@@ -135,7 +135,7 @@ app.post('/api/translate', async (req, res) => {
           console.log('Using better Hindi translation:', translatedText);
         }
       } else if (data.matches && data.matches.length > 0) {
-        const mtMatch = data.matches.find(match => 
+        const mtMatch = data.matches.find((match: any) => 
           match.reference === 'Machine Translation.' || match['created-by'] === 'MT!'
         );
 
