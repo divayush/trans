@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Translation endpoint optimized for Vercel
-app.post('/api/translate', async (req, res) => {
+app.post('/api/translate', async (req: Request, res: Response) => {
   try {
     const { text, targetLanguage, sourceLanguage } = req.body;
     console.log('Translation request:', { text, targetLanguage, sourceLanguage });
@@ -67,7 +67,7 @@ app.post('/api/translate', async (req, res) => {
           return res.json(result);
         }
       }
-    } catch (googleError) {
+    } catch (googleError: unknown) {
       console.warn('Google Translate failed, trying LibreTranslate:', googleError instanceof Error ? googleError.message : String(googleError));
     }
 
@@ -100,7 +100,7 @@ app.post('/api/translate', async (req, res) => {
           return res.json(result);
         }
       }
-    } catch (libreError) {
+    } catch (libreError: unknown) {
       console.warn('LibreTranslate failed, trying MyMemory:', libreError instanceof Error ? libreError.message : String(libreError));
     }
 
@@ -164,7 +164,7 @@ app.post('/api/translate', async (req, res) => {
 });
 
 // Handle all other routes
-app.all('*', (req, res) => {
+app.all('*', (req: Request, res: Response) => {
   res.status(404).json({ error: 'Not found' });
 });
 
