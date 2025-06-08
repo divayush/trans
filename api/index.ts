@@ -1,16 +1,5 @@
 
-import express, { type Request, Response, NextFunction } from "express";
-import { createServer } from "http";
-
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-// Translation endpoint optimized for Vercel
-app.post('/api/translate', async (req, res) => {
-  try {
-    const { text, targetLanguage, sourceLanguage } = req.body;
-    console.log('Translation request:', { text, targetLanguage, sourceLanguage });
+ranslation request:', { text, targetLanguage, sourceLanguage });
 
     if (!text || !targetLanguage) {
       return res.status(400).json({ error: 'Missing required fields' });
