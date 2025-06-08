@@ -23,74 +23,157 @@ const openai = new OpenAI({
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
-  // MyMemory Free Translation API endpoint
+  // Translation API endpoint with LibreTranslate first, then Google, then MyMemory
   app.post("/api/translate", async (req, res) => {
     try {
       const { text, targetLanguage, sourceLanguage } = req.body;
-
       console.log('Translation request:', { text, targetLanguage, sourceLanguage });
 
       if (!text || !targetLanguage) {
-        return res.status(400).json({ message: "Text and target language are required" });
+        return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      // Use MyMemory Free Translation API (no API key required)
-      const sourceLang = sourceLanguage && sourceLanguage !== 'auto' ? sourceLanguage : 'en';
-      const langPair = `${sourceLang}|${targetLanguage}`;
+      // Auto-detect language if not provided or set to 'auto'
+      let detectedSourceLang = sourceLanguage;
+      if (!sourceLanguage || sourceLanguage === 'auto') {
+        try {
+          const detectResponse = await fetch('https://ws.detectlanguage.com/0.2/detect', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer demo', // Free demo key
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ q: text })
+          });
 
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
-
-      console.log('Calling MyMemory API:', url);
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; TransLingo/1.0)',
+          if (detectResponse.ok) {
+            const detectData = await detectResponse.json();
+            if (detectData.data && detectData.data.detections && detectData.data.detections.length > 0) {
+              detectedSourceLang = detectData.data.detections[0].language;
+              console.log('Detected language:', detectedSourceLang);
+            }
+          }
+        } catch (detectError) {
+          console.warn('Language detection failed, using fallback');
         }
-      });
-
-      if (!response.ok) {
-        console.error('MyMemory API error:', response.statusText);
-        throw new Error(`Translation API error: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      console.log('MyMemory API response:', data);
-
-      if (!data.responseData || !data.responseData.translatedText) {
-        throw new Error('Invalid response format from translation API');
-      }
-
-      let translatedText = data.responseData.translatedText;
-
-      // Clean up common MyMemory artifacts
-      if (translatedText === text || translatedText.includes('MYMEMORY WARNING')) {
-        // Fallback to simple translation if MyMemory fails
-        translatedText = await getFallbackTranslation(text, targetLanguage);
-      }
-
-      res.json({
-        translatedText,
-        sourceLanguage: sourceLang,
-        targetLanguage,
-        confidence: data.responseData.match || 0.85
-      });
-    } catch (error) {
-      console.error('Translation error:', error as Error);
-
-      // Fallback to simple translation
+      // Try LibreTranslate first as primary service
       try {
-        const fallbackTranslation = await getFallbackTranslation(req.body.text, req.body.targetLanguage);
-        res.json({
-          translatedText: fallbackTranslation,
-          sourceLanguage: req.body.sourceLanguage || 'en',
-          targetLanguage: req.body.targetLanguage,
-          confidence: 0.75
+        console.log('Trying LibreTranslate API...');
+        const libreResponse = await fetch('https://libretranslate.com/translate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (compatible; TransLingo/1.0)',
+          },
+          body: JSON.stringify({
+            q: text,
+            source: detectedSourceLang === 'auto' ? 'auto' : detectedSourceLang || 'en',
+            target: targetLanguage,
+            format: 'text'
+          })
         });
-      } catch (fallbackError) {
-        console.error('Fallback translation error:', fallbackError);
-        res.status(500).json({ message: "Translation failed", error: error.message });
+
+        console.log('LibreTranslate response status:', libreResponse.status);
+        
+        if (libreResponse.ok) {
+          const libreData = await libreResponse.json();
+          console.log('LibreTranslate API response:', libreData);
+
+          if (libreData.translatedText) {
+            const result = {
+              translatedText: libreData.translatedText,
+              sourceLanguage: libreData.detectedLanguage || detectedSourceLang || 'en',
+              targetLanguage,
+              confidence: 0.95
+            };
+            console.log('LibreTranslate success, returning result');
+            return res.json(result);
+          }
+        } else {
+          const errorText = await libreResponse.text();
+          console.warn('LibreTranslate API error:', libreResponse.status, errorText);
+        }
+      } catch (libreError) {
+        console.warn('LibreTranslate failed with error:', libreError instanceof Error ? libreError.message : String(libreError));
       }
+
+      // Try Google Translate as backup
+      try {
+        console.log('Trying Google Translate API...');
+        const googleUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedSourceLang || 'auto'}&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(text)}`;
+        
+        const googleResponse = await fetch(googleUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; TransLingo/1.0)',
+          }
+        });
+
+        console.log('Google Translate response status:', googleResponse.status);
+
+        if (googleResponse.ok) {
+          const googleData = await googleResponse.json();
+          console.log('Google Translate API response:', googleData);
+
+          if (googleData && googleData[0] && googleData[0][0] && googleData[0][0][0]) {
+            let translatedText = googleData[0].map(item => item[0]).join('');
+            
+            const result = {
+              translatedText,
+              sourceLanguage: googleData[2] || detectedSourceLang || 'en',
+              targetLanguage,
+              confidence: 0.9
+            };
+            console.log('Google Translate success, returning result');
+            return res.json(result);
+          }
+        } else {
+          const errorText = await googleResponse.text();
+          console.warn('Google Translate API error:', googleResponse.status, errorText);
+        }
+      } catch (googleError) {
+        console.warn('Google Translate failed with error:', googleError instanceof Error ? googleError.message : String(googleError));
+      }
+
+      // Try MyMemory as final fallback
+      try {
+        console.log('Trying MyMemory API...');
+        const myMemoryUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${detectedSourceLang || 'en'}|${targetLanguage}`;
+        console.log('Calling MyMemory API:', myMemoryUrl);
+        
+        const myMemoryResponse = await fetch(myMemoryUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; TransLingo/1.0)',
+          }
+        });
+
+        if (myMemoryResponse.ok) {
+          const myMemoryData = await myMemoryResponse.json();
+          console.log('MyMemory API response:', myMemoryData);
+
+          if (myMemoryData.responseData && myMemoryData.responseData.translatedText) {
+            const result = {
+              translatedText: myMemoryData.responseData.translatedText,
+              sourceLanguage: detectedSourceLang || 'en',
+              targetLanguage,
+              confidence: myMemoryData.responseData.match || 0.8
+            };
+            console.log('MyMemory success, returning result');
+            return res.json(result);
+          }
+        } else {
+          console.warn('MyMemory API error:', myMemoryResponse.status);
+        }
+      } catch (myMemoryError) {
+        console.warn('MyMemory failed with error:', myMemoryError instanceof Error ? myMemoryError.message : String(myMemoryError));
+      }
+
+      // If all translation services fail, return an error
+      throw new Error('All translation services are currently unavailable. Please try again later.');
+    } catch (error) {
+      console.error('Translation error:', error);
+      res.status(500).json({ error: 'Translation failed' });
     }
   });
 
