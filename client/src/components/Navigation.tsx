@@ -24,7 +24,7 @@ export default function Navigation() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.path;
-
+            
             return (
               <motion.div
                 key={item.path}
@@ -67,7 +67,7 @@ export default function Navigation() {
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
-
+              
               return (
                 <motion.div
                   key={item.path}
@@ -383,12 +383,11 @@ export function Navigation() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setLocation(item.path)}
-                      onTouchStart={() => {}} // Ensure touch events are registered
                       className={`
-                        flex flex-col items-center justify-center p-3 h-16 w-full rounded-xl transition-all duration-200 mobile-nav-button
+                        flex flex-col items-center justify-center p-3 h-16 w-full rounded-xl transition-all duration-300 mobile-nav-button
                         ${isActive 
                           ? 'bg-white/20 neon:bg-cyan-500/20' 
-                          : 'hover:bg-white/10 neon:hover:bg-cyan-500/10 active:bg-white/15 active:scale-95'
+                          : 'hover:bg-white/10 neon:hover:bg-cyan-500/10'
                         }
                       `}
                     >
