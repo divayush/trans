@@ -103,59 +103,8 @@ app.post('/api/translate', async (req: Request, res: Response) => {
       console.warn('LibreTranslate failed, trying MyMemory:', libreError instanceof Error ? libreError.message : String(libreError));
     }
 
-    // Final fallback to MyMemory with better Hindi handling
-    const langPair = `${detectedSourceLang || 'auto'}|${targetLanguage}`;
-    const encodedText = encodeURIComponent(text);
-    const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=${langPair}&de=translingo@example.com&mt=1`;
-
-    console.log('Calling MyMemory API as fallback:', url);
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    console.log('MyMemory API response:', data);
-
-    if (data.responseStatus === 200 && data.responseData) {
-      let translatedText = data.responseData.translatedText;
-      let confidence = data.responseData.match || 0.8;
-
-      // Special handling for Hindi translations - prioritize better quality matches
-      if (targetLanguage === 'hi' && data.matches && data.matches.length > 0) {
-        const bestMatch = data.matches.find((match: any) => 
-          (match.reference === 'Machine Translation.' || match['created-by'] === 'MT!') && 
-          match.quality >= 70 && 
-          match.translation && 
-          match.translation.length > translatedText.length * 0.8
-        );
-
-        if (bestMatch) {
-          translatedText = bestMatch.translation;
-          confidence = bestMatch.match;
-          console.log('Using better Hindi translation:', translatedText);
-        }
-      } else if (data.matches && data.matches.length > 0) {
-        const mtMatch = data.matches.find((match: any) => 
-          match.reference === 'Machine Translation.' || match['created-by'] === 'MT!'
-        );
-
-        if (mtMatch && mtMatch.quality >= 60) {
-          translatedText = mtMatch.translation;
-          confidence = mtMatch.match;
-          console.log('Using machine translation for better quality:', translatedText);
-        }
-      }
-
-      const result = {
-        translatedText,
-        sourceLanguage: detectedSourceLang || 'en',
-        targetLanguage,
-        confidence
-      };
-
-      res.json(result);
-    } else {
-      throw new Error('All translation services failed');
-    }
+    // If both Google Translate and LibreTranslate fail, return an error
+    throw new Error('Translation services are currently unavailable. Please try again later.');
   } catch (error: any) {
     console.error('Translation error:', error);
     res.status(500).json({ error: 'Translation failed' });
