@@ -144,35 +144,37 @@ body {
   .main-content {
     padding-bottom: calc(5rem + env(safe-area-inset-bottom));
   }
-  
+
   /* Optimized touch targets for mobile */
   .mobile-nav-button {
-    min-height: 4rem;
-    min-width: 3.5rem;
-    max-width: 4.5rem;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-  }
-  
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
   /* Better spacing for mobile cards */
   .mobile-card {
     margin-bottom: 1rem;
   }
-  
+
   /* iOS Safari specific fixes */
   @supports (-webkit-touch-callout: none) {
     .glass-morphism {
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translateZ(0);
+}
+
     /* Better iOS Safari microphone handling */
     input[type="audio"], 
     input[type="microphone"] {
       -webkit-appearance: none;
     }
   }
-  
+
   /* Better touch feedback */
   button, 
   .mobile-nav-button {
@@ -672,3 +674,59 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Performance optimizations for mobile */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button, .button {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Improve scroll performance */
+.scroll-smooth {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Reduce repaints for animations */
+.animate-in, .animate-out {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Optimize touch interactions */
+.touch-optimized {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Safe area support for mobile devices */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
