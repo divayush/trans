@@ -66,13 +66,9 @@ export default function HomePage() {
             y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
             scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
           }}
-          className="inline-flex items-center justify-center w-32 h-32 mb-6 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-xl border border-white/20 neon:glow neon:holographic"
+          className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-xl border border-white/20 neon:glow neon:holographic"
         >
-          <img 
-            src="/attached_assets/IMG_5310_1749370640954.png" 
-            alt="Chiefu Logo" 
-            className="w-20 h-20 object-contain"
-          />
+          <Globe className="w-12 h-12 text-blue-400 neon:text-cyan-400" />
         </motion.div>
 
         <h1 className="text-4xl md:text-6xl font-bold mb-4">
