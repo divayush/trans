@@ -18,7 +18,11 @@ const filterTabs = [
 
 export default function HistoryPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState(() => {
+    // Check if we should show favorites by default from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('filter') === 'favorites' ? 'favorites' : 'all';
+  });
   const [history, setHistory] = useState<TranslationHistory[]>(() => StorageService.getHistory());
   const { toast } = useToast();
   const { speak, isSpeaking } = useVoice();
@@ -123,9 +127,8 @@ export default function HistoryPage() {
     const total = history.length;
     const languages = new Set(history.flatMap(h => [h.sourceLanguage, h.targetLanguage])).size;
     const favorites = history.filter(h => h.isFavorite).length;
-    const streak = 7; // This would be calculated based on actual usage
 
-    return { total, languages, favorites, streak };
+    return { total, languages, favorites };
   }, [history]);
 
   const getTypeIcon = (type: string) => {
@@ -370,7 +373,7 @@ export default function HistoryPage() {
         <Card className="bg-white/5 backdrop-blur-xl border-white/10">
           <CardContent className="p-6">
             <h3 className="text-xl font-semibold mb-4">Your Statistics</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-400 mb-1">{stats.total}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">Total Translations</div>
@@ -382,10 +385,6 @@ export default function HistoryPage() {
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-400 mb-1">{stats.favorites}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">Favorites</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-400 mb-1">{stats.streak}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Days Streak</div>
               </div>
             </div>
 

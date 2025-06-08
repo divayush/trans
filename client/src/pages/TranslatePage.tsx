@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeftRight, Mic, Clipboard, Volume2, Copy, Share, Sparkles, Camera, History, Trash2 } from 'lucide-react';
+import { ArrowLeftRight, Mic, Clipboard, Volume2, Copy, Share, Sparkles, History, Trash2, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
@@ -261,10 +261,10 @@ export default function TranslatePage() {
         <Button
           variant="outline"
           className="h-16 sm:h-20 flex-col space-y-1 sm:space-y-2 bg-white/5 border-white/10 hover:bg-white/10 hover:border-blue-400/50"
-          onClick={() => setLocation('/camera')}
+          onClick={() => setLocation('/history?filter=favorites')}
         >
-          <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
-          <span className="text-xs sm:text-sm">Scan Image</span>
+          <Star className="w-5 h-5 sm:w-6 sm:h-6" />
+          <span className="text-xs sm:text-sm">Favorites</span>
         </Button>
 
         <Button
