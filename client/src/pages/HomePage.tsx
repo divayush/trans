@@ -8,36 +8,41 @@ import { useLocation } from 'wouter';
 const features = [
   {
     icon: Languages,
-    title: 'Real-time Translation',
-    description: 'Instant translation between multiple languages with neural networks',
+    title: 'Smart Translation',
+    description: 'Accurate translations powered by advanced AI models supporting 12+ languages',
   },
   {
     icon: Mic,
-    title: 'Voice Input',
-    description: 'Speak naturally and get voice-to-voice translation',
+    title: 'Voice Translation',
+    description: 'Speak in any language and hear the translation instantly with natural voices',
   },
   {
     icon: Sparkles,
-    title: 'Grammar Correction',
-    description: 'AI-powered grammar correction and writing improvements',
+    title: 'Context Awareness',
+    description: 'Understands context and nuances for more natural, meaningful translations',
   },
   {
-    icon: Wifi,
-    title: 'Web Based',
-    description: 'Works on any device with a modern web browser',
+    icon: Camera,
+    title: 'Text Recognition',
+    description: 'Capture and translate text from images, signs, and documents instantly',
   },
   {
     icon: Smartphone,
-    title: 'Mobile Optimized',
-    description: 'Responsive design for all screen sizes',
+    title: 'Cross-Platform',
+    description: 'Works seamlessly on desktop, tablet, and mobile devices',
+  },
+  {
+    icon: Wifi,
+    title: 'Offline Ready',
+    description: 'Progressive web app that works even when you\'re offline',
   },
 ];
 
 const realFeatures = [
-  { value: '12+', label: 'Languages Supported' },
-  { value: 'AI', label: 'Grammar Correction' },
-  { value: 'Voice', label: 'Speech Recognition' },
-  { value: 'Web', label: 'Cross Platform' },
+  { value: '12+', label: 'Languages' },
+  { value: 'AI', label: 'Powered' },
+  { value: 'Voice', label: 'Recognition' },
+  { value: 'Real-time', label: 'Translation' },
 ];
 
 export default function HomePage() {
@@ -55,27 +60,29 @@ export default function HomePage() {
         <motion.div
           animate={{ 
             y: [0, -10, 0],
-            rotate: [0, 360],
-            scale: [1, 1.1, 1]
+            scale: [1, 1.05, 1]
           }}
           transition={{ 
             y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-            rotate: { duration: 20, repeat: Infinity, ease: "linear" },
             scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
           }}
-          className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-xl border border-white/20 neon:glow neon:holographic"
+          className="inline-flex items-center justify-center w-32 h-32 mb-6 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-xl border border-white/20 neon:glow neon:holographic"
         >
-          <Globe className="w-12 h-12 text-blue-400 neon:text-cyan-400" />
+          <img 
+            src="/attached_assets/IMG_5310_1749370640954.png" 
+            alt="Chiefu Logo" 
+            className="w-20 h-20 object-contain"
+          />
         </motion.div>
 
         <h1 className="text-4xl md:text-6xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent neon:glitch neon:text-cyan-400" data-text="Chiefu">
-            Chiefu
+          <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent neon:glitch neon:text-cyan-400" data-text="Chiefu Translator">
+            Chiefu Translator
           </span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-          AI-powered translation app with OCR, voice input, and real-time language detection
+        <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+          Break language barriers with our intelligent translation platform. Experience seamless communication through AI-powered text translation, voice recognition, and real-time language detection.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
