@@ -1,6 +1,5 @@
 
-import express, { type Request, Response, NextFunction } from "express";
-import { createServer } from "http";
+import express, { Request, Response } from "express";
 
 const app = express();
 app.use(express.json());
@@ -36,7 +35,7 @@ app.post('/api/translate', async (req: Request, res: Response) => {
             console.log('Detected language:', detectedSourceLang);
           }
         }
-      } catch (detectError) {
+      } catch (detectError: any) {
         console.warn('Language detection failed, using fallback');
       }
     }
@@ -67,7 +66,7 @@ app.post('/api/translate', async (req: Request, res: Response) => {
           return res.json(result);
         }
       }
-    } catch (googleError: unknown) {
+    } catch (googleError: any) {
       console.warn('Google Translate failed, trying LibreTranslate:', googleError instanceof Error ? googleError.message : String(googleError));
     }
 
@@ -100,7 +99,7 @@ app.post('/api/translate', async (req: Request, res: Response) => {
           return res.json(result);
         }
       }
-    } catch (libreError: unknown) {
+    } catch (libreError: any) {
       console.warn('LibreTranslate failed, trying MyMemory:', libreError instanceof Error ? libreError.message : String(libreError));
     }
 
@@ -157,7 +156,7 @@ app.post('/api/translate', async (req: Request, res: Response) => {
     } else {
       throw new Error('All translation services failed');
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Translation error:', error);
     res.status(500).json({ error: 'Translation failed' });
   }
